@@ -7,12 +7,25 @@ use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Validator;
+use App\Repositories\Task\TaskRepositoryInterface;
 use App\Http\Controllers\Api\BaseController as BaseController;
 
 class TaskController extends BaseController
 {
-    public function index()
+    protected $taskRepository;
+
+    public function __construct(
+        TaskRepositoryInterface $taskRepository
+    ) {
+        $this->taskRepository = $taskRepository;
+    }
+
+    public function index(Request $request)
     {
+        // $per_page = $request->get('per_page') ?? 10;
+        // $tasks = $this->taskRepository->getAllWithPaginate($per_page);
+
+        // return response()->json($tasks);
         $tasks = Task::paginate(config('api.page.per_page'));
         
         return $this->handleResponse(TaskResource::collection($tasks)->response()->getData(), 'Tasks have been retrieved!');
