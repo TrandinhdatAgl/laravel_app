@@ -13,11 +13,9 @@ class TaskController extends BaseController
 {
     public function index()
     {
-        $tasks = Task::paginate(2);
-
-        return TaskResource::collection($tasks);
-        // return response()->json(TaskResource::collection($tasks));
-        // return $this->handleResponse(TaskResource::collection($tasks), 'Tasks have been retrieved!');
+        $tasks = Task::paginate(config('api.page.per_page'));
+        
+        return $this->handleResponse(TaskResource::collection($tasks)->response()->getData(), 'Tasks have been retrieved!');
     }
 
     public function store(Request $request)
