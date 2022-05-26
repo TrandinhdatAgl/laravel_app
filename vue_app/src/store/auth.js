@@ -1,43 +1,23 @@
-import axios from 'axios'
-import router from '../router'
+// import axios from 'axios'
+// import router from '../router'
 
 export default {
     namespaced: true,
     state:{
         authenticated:false,
-        user:{}
+        user: null
     },
-    getters:{
-        authenticated(state){
-            return state.authenticated
+    mutations: {
+        setAuth(state, user) {
+            localStorage.setItem('auth', JSON.stringify(user));
+            state.authenticated = true;
+            state.user = user;
         },
-        user(state){
-            return state.user
+        initializedAuth() {
+            if (localStorage.getItem('auth')) {
+                this.state.authenticated = true;
+                this.state.user = JSON.parse(localStorage.getItem('auth'));
+            }
         }
     },
-    mutations:{
-        SET_AUTHENTICATED (state, value) {
-            state.authenticated = value
-        },
-        SET_USER (state, value) {
-            state.user = value
-        }
-    },
-    actions:{
-        login({commit}){
-            return axios.get('http://127.0.0.1:8000/api/user').then(({data})=>{
-                commit('SET_USER',data)
-                commit('SET_AUTHENTICATED',true)
-                router.push({name:'dashboard-1'})
-            }).catch(({response:{data}})=>{
-                console.log(data);
-                commit('SET_USER',{})
-                commit('SET_AUTHENTICATED',false)
-            })
-        },
-        logout({commit}){
-            commit('SET_USER',{})
-            commit('SET_AUTHENTICATED',false)
-        }
-    }
 }

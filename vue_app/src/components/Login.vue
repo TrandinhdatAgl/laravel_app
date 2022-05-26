@@ -1,69 +1,59 @@
 <template>
-    <div class="container h-100">
-        <div class="row h-100 align-items-center">
-            <div class="col-12 col-md-6 offset-md-3">
-                <div class="card shadow sm">
-                    <div class="card-body">
-                        <h1 class="text-center">Login</h1>
-                        <hr/>
-                        <form action="javascript:void(0)" class="row" method="post">
-                            <div class="form-group col-12">
-                                <label for="email" class="font-weight-bold">Email</label>
-                                <input type="text" v-model="auth.email" name="email" id="email" class="form-control">
-                            </div>
-                            <div class="form-group col-12">
-                                <label for="password" class="font-weight-bold">Password</label>
-                                <input type="password" v-model="auth.password" name="password" id="password" class="form-control">
-                            </div>
-                            <div class="col-12 mb-2">
-                                <button type="submit" :disabled="processing" @click="login" class="btn btn-primary btn-block">
-                                    {{ processing ? "Please wait" : "Login" }}
-                                </button>
-                            </div>
-                            <div class="col-12 text-center">
-                                <label>Don't have an account? <router-link :to="{name:'register'}">Register Now!</router-link></label>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div>
+    <form @submit.prevent="handleLogin()">
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="form.email" />
+        <span class="text-danger" v-if="errors.email">
+            {{ errors.email[0]}}
+        </span>
+      </div>
+      <div class="form-group">
+        <input type="password" class="form-control" v-model="form.password" />
+        <span class="text-danger" v-if="errors.password">
+            {{ errors.password[0] }}
+        </span>
+      </div>
+      <button type="submit" class="btn btn-primary">Se connecter</button>
+    </form>
+  </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import axios from 'axios'
+import axios from "axios";
+
 export default {
-    name:"login-1",
-    data(){
+    name: 'LoginComponent',
+
+    data() {
         return {
-            auth:{
-                email:"",
-                password:""
-            },
-            processing:false
-        }
+        form: {
+            email: null,
+            password: null,
+        },
+        errors: {},
+        };
     },
-    methods:{
-        ...mapActions({
-            signIn:'http://127.0.0.1:8000/api/login'
-        }),
-        async login(){
-            this.processing = true
-            await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie')
-            .then(() => {
-                axios.post('http://127.0.0.1:8000/api/login',this.auth).then(({data})=>{
-                    console.log(data);
-                    this.signIn()
-                }).catch(({response:{data}})=>{
-                    alert(data.message)
-                }).finally(()=>{
-                    this.processing = false
-                })
+    methods: {
+        async handleLogin() {
+        try {
+            await axios.get("/sanctum/csrf-cookie");
+            await axios.post("/api/login", this.form).then((response) => {
+                let access_token = response.data.data.token;
+                axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}` 
             })
 
+            let response = await axios.get("/api/user");
+            console.log(response.data);
+            this.$store.commit('auth/setAuth', response.data);
+
+
+            this.$router.push('about');
+        } catch (error) {
+            this.errors = error.response.data.errors;
+        }
         },
-    }
-}
+    },
+};
 </script>
+
+<style></style>

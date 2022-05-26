@@ -1,11 +1,12 @@
 <template>
-<div>
-  <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-          <router-link :to="{name:'login'}" class="nav-link">Home <span class="sr-only">(current)</span></router-link>
-      </li>
-  </ul>
-   <router-view></router-view>
+<div id="app">
+  <div id="nav">
+     <router-link to="/">Dashboard</router-link>|
+     <router-link to="/about">About</router-link>|
+     <router-link to="/acount" v-if="this.$store.state.user">{{ this.$store.state.user.name }}</router-link>|
+     <router-link to="/login">Login </router-link>
+  </div>
+  <router-view></router-view>
 </div>
 </template>
 
