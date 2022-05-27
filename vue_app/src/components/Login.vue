@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="row justify-content-center">
     <form @submit.prevent="handleLogin()">
       <div class="form-group">
         <input type="text" class="form-control" v-model="form.email" />
@@ -13,7 +13,7 @@
             {{ errors.password[0] }}
         </span>
       </div>
-      <button type="submit" class="btn btn-primary">Se connecter</button>
+      <button type="submit" class="btn btn-primary">Login</button>
     </form>
   </div>
 </template>
@@ -27,30 +27,31 @@ export default {
     data() {
         return {
         form: {
-            email: null,
-            password: null,
+          email: null,
+          password: null,
         },
         errors: {},
         };
     },
     methods: {
         async handleLogin() {
-        try {
-            await axios.get("/sanctum/csrf-cookie");
-            await axios.post("/api/login", this.form).then((response) => {
-                let access_token = response.data.data.token;
-                axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}` 
-            })
+          try {
+              await axios.get("/sanctum/csrf-cookie");
+              await axios.post("/api/login", this.form).then((response) => {
+                  let access_token = response.data.data.token;
+                  axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}` 
+                  localStorage.setItem('access_token', `Bearer ${access_token}`)
+              })
 
-            let response = await axios.get("/api/user");
-            console.log(response.data);
-            this.$store.commit('auth/setAuth', response.data);
+              let response = await axios.get("/api/user");
+              console.log(response.data);
+              this.$store.commit('auth/setAuth', response.data);
 
 
-            this.$router.push('about');
-        } catch (error) {
-            this.errors = error.response.data.errors;
-        }
+              this.$router.push('about');
+          } catch (error) {
+              this.errors = error.response.data.errors;
+          }
         },
     },
 };

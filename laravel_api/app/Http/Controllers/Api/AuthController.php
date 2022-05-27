@@ -50,4 +50,11 @@ class AuthController extends BaseController
 
         return $this->handleResponse($success, 'User successfully registered!');
     }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return $this->handleResponse([], 'Logged out');
+    }
 }

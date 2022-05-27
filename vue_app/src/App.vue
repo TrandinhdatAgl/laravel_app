@@ -1,25 +1,22 @@
 <template>
-<div id="app">
-  <div id="nav">
-     <router-link to="/">Dashboard</router-link>|
-     <router-link to="/about">About</router-link>|
-     <router-link to="/acount" v-if="this.$store.state.user">{{ this.$store.state.user.name }}</router-link>|
-     <router-link to="/login">Login </router-link>
+  <div id="app">
+    <nav-component></nav-component>
+    <router-view></router-view>
   </div>
-  <router-view></router-view>
-</div>
 </template>
 
 <script>
+import NavComponent from "@/components/layouts/Nav";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-  }
-}
+    NavComponent
+  },
+};
 </script>
 
-<style>
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -27,5 +24,17 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+#nav {
+  margin-bottom: 20px;
+  a {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    margin: 0 5px;
+  }
+  &:hover {
+    color: lightgray;
+  }
 }
 </style>

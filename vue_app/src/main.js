@@ -14,9 +14,9 @@ axios.defaults.baseURL = 'http://127.0.0.1:8000';
 
 const app = createApp({
     extends: App, 
-    beforeCreate() { 
-        this.$store.commit('auth/initializedAuth'); 
-    }  
+    // beforeCreate() { 
+    //     this.$store.commit('auth/initializedAuth'); 
+    // }  
 })
 app.use(router)
 app.use(store)
