@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import axios from "axios";
 
 export default {
     name: 'LoginComponent',
@@ -36,21 +35,12 @@ export default {
     methods: {
         async handleLogin() {
           try {
-              await axios.get("/sanctum/csrf-cookie");
-              await axios.post("/api/login", this.form).then((response) => {
-                  let access_token = response.data.data.token;
-                  axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}` 
-                  localStorage.setItem('access_token', `Bearer ${access_token}`)
-              })
-
-              let response = await axios.get("/api/user");
-              console.log(response.data);
-              this.$store.commit('auth/setAuth', response.data);
-
-
-              this.$router.push('about');
+            await this.$store.dispatch('auth/login', this.form);
+            await this.$store.dispatch('auth/getCurrentUser', []);
+             
+            this.$router.push('dashboard');
           } catch (error) {
-              this.errors = error.response.data.errors;
+            this.errors = error.response.data.errors;
           }
         },
     },

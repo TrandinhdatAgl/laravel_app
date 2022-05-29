@@ -1,10 +1,12 @@
+import request from '@/api/requests';
 import axios from "axios";
 
 export default {
     namespaced: true,
-    state:{
-        authenticated:false,
-        user: null
+    state: {
+        authenticated: false,
+        user: null,
+        token: sessionStorage.getItem("TOKEN"),
     },
     mutations: {
         setAuth(state, user) {
@@ -13,18 +15,23 @@ export default {
             state.user = user;
         },
 
-        initializedAuth() {
-            if (localStorage.getItem('auth')) {
-                this.state.authenticated = true;
-                this.state.user = JSON.parse(localStorage.getItem('auth'));
-            }
-        },
-
         logoutAuth(state) {
             state.authenticated = false;
             state.user = null;
             localStorage.removeItem('auth')
-            localStorage.removeItem('access_token')
+            sessionStorage.removeItem('TOKEN')
+        },
+
+        setToken(state, token) {
+            state.token = token;
+            sessionStorage.setItem('TOKEN', token);
+        },
+        setUser(state, user) {
+            state.user = user;
+            localStorage.setItem('auth', JSON.stringify(user));
+        },
+        setAuthenticated(state, authenticated) {
+            state.authenticated = authenticated;
         }
     },
     actions: {
@@ -40,15 +47,15 @@ export default {
         //         commit('authUser', {
         //           token: res.data.token
         //         })
-              
+
         //         router.push("/dashboard")
         //       })
         //       .catch(error => console.log(error))
         //   },
 
-        register({commit}, payload) {
-            console.log({'commit': commit});
-            console.log({'payload': payload});
+        register({ commit }, payload) {
+            console.log({ 'commit': commit });
+            console.log({ 'payload': payload });
 
             let config = {
                 headers: {
@@ -60,8 +67,31 @@ export default {
             axios.post('/api/register', payload, config).then((response) => {
                 console.log(response);
             })
-        }
+        },
+
+        login({commit}, user) {
+            return request.post('/login', user)
+            .then((response) => {
+                commit('setToken', response.data.data.token)
+                commit('setAuthenticated', true);
+                return response.data
+            })
+        },
+
+        getCurrentUser({commit}) {
+            return request.get('/user')
+            .then((response) => {
+                commit('setUser', response.data);
+            })
+        },
+
+        logout({commit}) {
+            return request.post('/logout')
+            .then((response) => {
+                commit('setAuthenticated', false);
+                commit('setUser', null);
+                return response
+            })
+        },
     }
-
-
 }
